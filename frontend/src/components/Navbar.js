@@ -4,7 +4,7 @@ import Logo from "../media/logo.png";
 
 const Navbar = () => {
   return (
-    <nav class="bg-white border-gray-200 dark:bg-gray-900">
+    <nav class="bg-white border-gray-200 dark:bg-gray-900 overflow-y-scroll no-scrollbar">
       <div class="max-w-screen-lg flex flex-wrap items-center justify-between mx-auto p-4">
         <Link to="/">
           <p

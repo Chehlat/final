@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { type } = require("os");
+const { types } = require("util");
 const Schema = mongoose.Schema;
 
 const professorsSchema = new Schema(

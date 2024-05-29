@@ -7,12 +7,13 @@ import Departments from "./pages/Departments";
 
 function App() {
   return (
-    <div className="App">
+    <div class="">
       <BrowserRouter>
         <Navbar />
-        <div className="">
+        <div className="overflow-y-scroll no-scrollbar">
           <Routes>
             <Route path="/" element={<Home />} />
+
             <Route path="/professors" element={<Professors />} />
             <Route path="/departments" element={<Departments />} />
           </Routes>

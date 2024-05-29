@@ -1,12 +1,15 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import FetchData from "../components/Fetch";
-import ThreeDots from "../components/DropDown";
+import { useProfessorContext } from "../hooks/useProfessorContext";
 import PopupForm from "../components/PopupForm";
+import { Link } from "react-router-dom";
 
 const Professors = () => {
+  const { professors, deleteProfessor } = useProfessorContext();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [dropdownStates, setDropdownStates] = useState(null);
+  const dropdownRef = useRef(null);
 
   const toggleDropDown = (id) => {
     if (dropdownStates === id) {
@@ -15,19 +18,31 @@ const Professors = () => {
       setDropdownStates(id); // Open the dropdown for the clicked row
     }
   };
+  const togglePopup = () => {
+    setIsPopupOpen(!isPopupOpen);
+  };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownStates(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   return (
     <FetchData url="http://localhost:5000/api/professors">
-      {({ data, loading, error }) => {
+      {({ loading, error }) => {
         if (loading) return <p>Loading...</p>;
         if (error) return <p>Error: {error.message}</p>;
-        const togglePopup = () => {
-          setIsPopupOpen(!isPopupOpen);
-        };
 
         return (
-          <div>
-            <section class="bg-gray-50 dark:bg-gray-900 ">
+          <div class="overflow-y-scroll no-scrollbar">
+            <section class="bg-gray-50 dark:bg-gray-900 overflow-y-scroll no-scrollbar">
               <div class="m-auto max-w-screen-lg ">
                 {/* <!-- Start coding here --> */}
                 <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -112,51 +127,85 @@ const Professors = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {data.map((professor) => (
-                          <>
-                            <tr
-                              key={professor.tabel_id}
-                              class="border-b dark:border-gray-700"
-                            >
-                              <th
-                                scope="row"
-                                class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        {professors &&
+                          professors.map((professor) => (
+                            <>
+                              <tr
+                                key={professor._id}
+                                class="border-b dark:border-gray-700"
                               >
-                                {professor.name}
-                              </th>
-                              <td class="px-4 py-3">{professor.position}</td>
-                              <td class="px-4 py-3">{professor.degree}</td>
-                              <td class="px-4 py-3">{professor.wage}</td>
-                              <td class="px-4 py-3">{professor.start_date}</td>
-                              <td class="px-4 py-3 flex items-center justify-end">
-                                <button
-                                  onClick={() =>
-                                    toggleDropDown(professor.tabel_id)
-                                  }
-                                  class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-                                  type="button"
+                                <th
+                                  scope="row"
+                                  class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                 >
-                                  <svg
-                                    class="w-5 h-5"
-                                    aria-hidden="true"
-                                    fill="currentColor"
-                                    viewbox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                  </svg>
-                                </button>
-                                {dropdownStates === professor.tabel_id && (
-                                  <ThreeDots
-                                    toggleDropDown={() =>
-                                      toggleDropDown(professor.tabel_id)
+                                  {professor.name}
+                                </th>
+                                <td class="px-4 py-3">{professor.position}</td>
+                                <td class="px-4 py-3">{professor.degree}</td>
+                                <td class="px-4 py-3">{professor.wage}</td>
+                                <td class="px-4 py-3">
+                                  {professor.start_date}
+                                </td>
+                                <td class="px-4 py-3 flex items-center justify-end">
+                                  <button
+                                    onClick={() =>
+                                      toggleDropDown(professor._id)
                                     }
-                                  />
-                                )}
-                              </td>
-                            </tr>
-                          </>
-                        ))}
+                                    class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+                                    type="button"
+                                  >
+                                    <svg
+                                      class="w-5 h-5"
+                                      aria-hidden="true"
+                                      fill="currentColor"
+                                      viewbox="0 0 20 20"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    </svg>
+                                  </button>
+
+                                  {dropdownStates === professor._id && (
+                                    <div
+                                      ref={dropdownRef}
+                                      class=" absolute right-0 translate-y-3/4 z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+                                    >
+                                      <ul
+                                        class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="apple-imac-27-dropdown-button"
+                                      >
+                                        <li>
+                                          <a
+                                            href="#"
+                                            class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                          >
+                                            Подробнее
+                                          </a>
+                                        </li>
+                                        <li>
+                                          <Link to="/:id">
+                                            <button class="block w-full text-left py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                              Редактировать
+                                            </button>
+                                          </Link>
+                                        </li>
+                                      </ul>
+                                      <div class="py-1">
+                                        <button
+                                          onClick={() =>
+                                            deleteProfessor(professor._id)
+                                          }
+                                          class="block w-full text-left py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                        >
+                                          Удалить
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            </>
+                          ))}
                       </tbody>
                     </table>
                   </div>

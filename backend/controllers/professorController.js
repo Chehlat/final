@@ -21,8 +21,17 @@ const getProfessor = async (req, res) => {
 };
 //create a new one
 const createProfessor = async (req, res) => {
-  const { name, position, degree, addres, phone, tabel_id, wage, start_date } =
-    req.body;
+  const {
+    name,
+    position,
+    degree,
+    addres,
+    phone,
+    tabel_id,
+    wage,
+    _id,
+    start_date,
+  } = req.body;
   try {
     const professor = await Professor.create({
       name,
@@ -30,7 +39,7 @@ const createProfessor = async (req, res) => {
       degree,
       addres,
       phone,
-
+      _id,
       tabel_id,
       wage,
       start_date,

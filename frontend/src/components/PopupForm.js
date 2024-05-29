@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useProfessorContext } from "../hooks/useProfessorContext";
 
 const PopupForm = ({ togglePopup }) => {
+  const { dispatch } = useProfessorContext();
+
   const [name, setName] = useState("");
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
@@ -42,6 +45,7 @@ const PopupForm = ({ togglePopup }) => {
       setTabel_id("");
       setWage("");
       setError(null);
+      dispatch({ type: "CREATE_PROFESSOR", payload: json });
       console.log("New porfessor added");
     }
     // Handle form submission logic
@@ -215,7 +219,7 @@ const PopupForm = ({ togglePopup }) => {
             </div>
           </div>
           <button class="absolute   inline-flex items-center px-5 py-2.5 mt-4 sm:mb-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
-            Добавить
+            Сохранить
           </button>
         </form>
       </div>
